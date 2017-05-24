@@ -8,29 +8,23 @@ $(document).ready(()=>{
 
 	const nowPlayingURL = apiBaseURL + '/movie/now_playing?api_key='+apiKey;
 
-	function getHTML(data) {
-		var newHTML = '';
-		for(let i = 0; i < data.results.length; i++) {
-			var posterURL = imageBaseURL + 'w300' + data.results[i].poster_path;
-			newHTML += `<div class="col-sm-6 col-md-3">`
-			newHTML += `<img src="${posterURL}">`;
-			newHTML += `</div>`;
-		}
-		return newHTML
-	}
-
-	$.getJSON(nowPlayingURL, (nowPlayingData)=>{
-		var nowPlayingHTML = '';
-		console.log(nowPlayingData);
-		for(let i = 0; i < nowPlayingData.results.length; i++) {
-			// Note: You have to specify the size of the image. w300 is one of the available sizes specified within the object.
-			var posterURL = imageBaseURL + 'w300' + nowPlayingData.results[i].poster_path;
-			nowPlayingHTML += `<div class="col-sm-6 col-md-3">`
-				nowPlayingHTML += `<img src="${posterURL}">`;
-			nowPlayingHTML += `</div>`;
-		}
+	$.getJSON(nowPlayingURL,(nowPlayingData)=>{
+		var nowPlayingHTML = getHTML(nowPlayingData);
+		console.log(nowPlayingHTML)
 		$('#movie-grid').html(nowPlayingHTML);
-
+		$('.movie-poster').click(function(){
+			// Change the HTML inside of the modal
+			var thisMovieId = $(this).attr("id");
+			console.log(thisMovieId);
+			var thisMovieURL = `${apiBaseURL}/movie/${thisMovieId}?api_key=${apiKey}`;
+			console.log(thisMovieURL);
+			$.getJSON(thisMovieURL,(thisMovieData)=>{
+				console.log(thisMovieData);
+				$('#myModalLabel').html(thisMovieData.title);
+				// Open the modal
+				$('#myModal').modal();
+			});
+		});
 	});
 
 
@@ -51,10 +45,19 @@ $(document).ready(()=>{
 			// console.log(searchMovieHTML);
 			$('#movie-grid').html(searchMovieHTML);
 		});
-
-
-
 	});
+
+
+	function getHTML(data){
+		var newHTML = '';
+		for(let i = 0; i < data.results.length; i++){
+			var posterURL = imageBaseURL + 'w300' + data.results[i].poster_path;
+			newHTML += `<div class="col-sm-6 col-md-3 movie-poster" id="${data.results[i].id}">`;
+				newHTML += `<img src="${posterURL}">`;
+			newHTML += `</div>`;
+		}
+		return newHTML;
+	}
 
 });
 
